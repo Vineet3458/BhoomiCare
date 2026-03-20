@@ -1,9 +1,19 @@
-import React from 'react'
+import { SOIL } from "../data/soilData";
 
-const Nutrients = () => {
+export default function Nutrients() {
   return (
-    <div>Nutrients</div>
-  )
-}
+    <div className="page">
+      <h1>Nutrient Profile</h1>
 
-export default Nutrients
+      <div className="grid-2">
+        {SOIL.macro.map((n, i) => (
+          <div key={i} className="card">
+            <h3>{n.name}</h3>
+            <p>{n.val} {n.unit}</p>
+            <p>Status: {n.status}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
