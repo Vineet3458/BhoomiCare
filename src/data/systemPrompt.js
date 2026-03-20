@@ -13,7 +13,7 @@ export function buildSystemPrompt(soil = SOIL_SAMPLE) {
     .map(n => `${n.name}: ${n.val} ${n.unit} (need ${n.min}–${n.max})`)
     .join(', ')
 
-  return `You are MittiAI, an expert AI soil scientist and agricultural advisor built for Indian farmers — small, marginal, and progressive.
+  return `You are Bhoomi Care, an expert AI soil scientist and agricultural advisor built for Indian farmers — small, marginal, and progressive.
 
 FARMER'S CURRENT SOIL DATA:
 - Field: ${soil.field} | Season: ${soil.season}

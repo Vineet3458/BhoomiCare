@@ -128,7 +128,7 @@ export default function Dashboard({ setTab }) {
           <ActionPlan title={db.actionPlanTitle} items={db.actionItems} />
 
           {/* CTA row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <button
               onClick={() => setTab('nutrients')}
               className="bg-moss-600 hover:bg-moss-700 text-white rounded-2xl py-3 px-4 text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
@@ -142,12 +142,19 @@ export default function Dashboard({ setTab }) {
               📋 {t.nav.schemes} →
             </button>
             <button
+              onClick={() => setTab('market')}
+              className="bg-earth-600 hover:bg-earth-700 text-white rounded-2xl py-3 px-4 text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+            >
+              🛒 Marketplace →
+            </button>
+            <button
               onClick={() => setTab('ai')}
-              className="bg-earth-500 hover:bg-earth-600 text-white rounded-2xl py-3 px-4 text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+              className="bg-amber-600 hover:bg-amber-700 text-white rounded-2xl py-3 px-4 text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
             >
               🤖 {t.nav.ai} →
             </button>
           </div>
+
         </div>
       </div>
     </div>
