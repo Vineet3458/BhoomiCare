@@ -48,14 +48,15 @@ function MacroMiniCard({ n, t }) {
 
 export default function Dashboard({ setTab }) {
   const { t }             = useLang()
-  const { data, loading } = useSoilData()
+  const { data, loading, updateSoilData, marketRecs } = useSoilData()
   const [showUpload, setShowUpload] = useState(false)
   const [uploadedData, setUploadedData] = useState(null)
 
   if (loading || !data) {
     return (
-      <div className="flex items-center justify-center h-64 text-earth-400 font-semibold">
-        Loading soil data…
+      <div className="flex flex-col items-center justify-center h-64 text-earth-800 font-semibold">
+        <div className="w-10 h-10 border-4 border-earth-200 border-t-earth-500 rounded-full animate-spin mb-3"></div>
+        Processing Soil Data…
       </div>
     )
   }
@@ -65,7 +66,17 @@ export default function Dashboard({ setTab }) {
   function handleUploadDone(parsedData) {
     setUploadedData(parsedData)
     setShowUpload(false)
+    updateSoilData(parsedData) // Trigger full calculation logic
   }
+
+  // Generate dynamic actionable advice from the current soil data
+  const dynamicActionItems = [
+    ...data.macro.filter(n => n.status !== 'optimal').map(n => n.recommendation),
+    ...data.micro.filter(n => n.status !== 'optimal').map(n => n.recommendation),
+  ]
+
+  // Fallback if somehow no issues found
+  const actionItemsToDisplay = dynamicActionItems.length > 0 ? dynamicActionItems : ['No major interventions required. Maintain current schedule.']
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
@@ -83,14 +94,14 @@ export default function Dashboard({ setTab }) {
         <div className="mb-4 bg-moss-50 border border-moss-200 text-moss-800 rounded-2xl px-5 py-3 flex items-center gap-3 animate-slide-up">
           <span className="text-xl">✅</span>
           <div>
-            <p className="font-bold text-sm">Soil report uploaded successfully!</p>
-            <p className="text-xs text-moss-600">Dashboard updated · Visit AI Chat for personalized recommendations</p>
+            <p className="font-bold text-sm">Soil report analysed successfully!</p>
+            <p className="text-xs text-moss-600">Dashboard updated analyzing {data.field} · Visit AI Chat for personalized recommendations</p>
           </div>
           <button onClick={() => setUploadedData(null)} className="ml-auto text-moss-400 hover:text-moss-600 text-lg">×</button>
         </div>
       )}
 
-      <div className="hero-pattern bg-earth-800 rounded-3xl p-6 mb-8 relative overflow-hidden">
+      <div className="hero-pattern bg-earth-800 rounded-3xl p-6 mb-8 relative overflow-hidden transition-all duration-500">
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-earth-300 text-sm font-semibold mb-1">🌾 {t.hero.greeting}</p>
@@ -98,10 +109,10 @@ export default function Dashboard({ setTab }) {
               {db.scoreLabel}
             </h1>
             <p className="text-earth-400 text-xs mt-1.5 flex items-center gap-1.5">
-              <MapPin size={11} /> {t.hero.location}
+              <MapPin size={11} /> {data.field}
             </p>
             <p className="text-earth-500 text-[10px] mt-1 flex items-center gap-1.5">
-              <CalendarDays size={10} /> Rabi 2025–26 · Test date: 10 Nov 2025
+              <CalendarDays size={10} /> {data.season || 'Rabi 2025–26'} · Test date: {data.testDate || 'Just Now'}
             </p>
           </div>
           <Button
@@ -178,7 +189,39 @@ export default function Dashboard({ setTab }) {
             ))}
           </div>
 
-          <ActionPlan title={db.actionPlanTitle} items={db.actionItems} />
+          <ActionPlan title={db.actionPlanTitle} items={actionItemsToDisplay} />
+
+          {/* Recommended Marketplace Products */}
+          {marketRecs.length > 0 && (
+            <Card className="p-4 bg-gradient-to-br from-earth-50 to-white animate-fade-in border-earth-200">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[12px] font-bold text-earth-800 uppercase tracking-wider flex items-center gap-1.5">
+                  🛒 Required Inputs (Marketplace)
+                </p>
+                <button onClick={() => setTab('market')} className="text-[11px] text-earth-500 hover:text-earth-700 font-bold hover:underline">
+                  View All →
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {marketRecs.map(prod => (
+                  <div key={prod.id} className="bg-white border border-earth-100 rounded-xl p-3 flex flex-col gap-2 shadow-sm hover:shadow transition-shadow">
+                     <div className="flex justify-between items-start">
+                       <span className="text-2xl">{prod.image}</span>
+                       <span className="text-[10px] font-bold bg-moss-50 text-moss-700 px-2 py-0.5 rounded-full">{prod.badge || 'Recommended'}</span>
+                     </div>
+                     <div>
+                       <h4 className="font-bold text-earth-900 text-sm truncate">{prod.name}</h4>
+                       <p className="text-[10px] text-earth-500">{prod.brand} · {prod.weight}</p>
+                       <p className="font-display font-bold text-moss-700 mt-0.5">₹{prod.price}</p>
+                     </div>
+                     <button onClick={() => setTab('market')} className="w-full mt-auto text-[11px] bg-earth-100 hover:bg-earth-200 text-earth-800 font-bold py-1.5 rounded-lg transition-colors">
+                       Buy Now
+                     </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* CTA row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

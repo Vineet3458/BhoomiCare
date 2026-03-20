@@ -70,16 +70,22 @@ export function useChat() {
 
       setMessages(prev => [...prev, { role: 'assistant', content: reply }])
     } catch (err) {
-      const isKey = err.message?.includes('API_KEY') || err.message?.includes('403')
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: isKey
-            ? '⚠️ **API Key issue.** Please add your Gemini API key to `.env.local`.\n\nGet a free key at: https://aistudio.google.com/app/apikey\n\nFor now, I\'m running in demo mode — try asking a farming question!'
-            : '🌿 **Connection issue** — please check your internet and try again.\n\n*Meanwhile: Is there a specific soil or crop question I can help with?*',
-        },
-      ])
+      const msg = err.message?.toLowerCase() || ''
+      const isKeyOrQuota = msg.includes('api key') || msg.includes('403') || msg.includes('400') || msg.includes('429') || msg.includes('quota')
+
+      if (isKeyOrQuota) {
+        // Automatically fallback to demo mode if API key is invalid or quota is exceeded
+        const demo = getDemoReply(text)
+        setMessages(prev => [...prev, { role: 'assistant', content: demo }])
+      } else {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: '🌿 **Connection issue** — please check your internet and try again.\n\n*Meanwhile: Is there a specific soil or crop question I can help with?*',
+          },
+        ])
+      }
     } finally {
       setLoading(false)
     }

@@ -36,7 +36,11 @@ export function UploadModal({ onClose, onUpload }) {
             const headers = lines[0].split(',')
             const values  = lines[1]?.split(',') ?? []
             const obj = {}
-            headers.forEach((h, i) => { obj[h.trim()] = values[i]?.trim() })
+            headers.forEach((h, i) => { 
+              const key = h.trim().replace(/^"|"$/g, '')
+              const val = (values[i] || '').trim().replace(/^"|"$/g, '')
+              obj[key] = val 
+            })
             setPreview(obj)
           } else {
             const obj = JSON.parse(raw)
