@@ -34,7 +34,7 @@ const SEED = {
 }
 
 const DEFAULT_SEED = [
-  { id:99, author:'MittiAI', avatar:'🤖', lang:'en', isAI:true, text:'Welcome to the MittiAI Farmer Community! Select your state/region above to join farmers near you. You can ask questions in any Indian language and MittiAI will help answer them.', time:'', isSeed:true },
+  { id:99, author:'Bhoomi Care', avatar:'🤖', lang:'en', isAI:true, text:'Welcome to the Bhoomi Care Farmer Community! Select your state/region above to join farmers near you. You can ask questions in any Indian language and Bhoomi Care will help answer them.', time:'', isSeed:true },
 ]
 
 export function useCommunity() {
@@ -69,23 +69,36 @@ export function useCommunity() {
   const askAI = useCallback(async (msgId, msgText) => {
     setAiLoading(prev => ({ ...prev, [msgId]: true }))
     setTypingId(msgId)
+
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY
+    if (!apiKey || apiKey === 'your_gemini_api_key_here') {
+      await new Promise(r => setTimeout(r, 800))
+      setAiReplies(prev => ({ ...prev, [msgId]: '🌿 <b>Bhoomi Care AI (Demo Mode):</b> Please add your Gemini API key in <code>.env.local</code> to get real-time answers. For now, consult your local KVK or apply 45kg/ha Urea for nitrogen concerns.' }))
+      setAiLoading(prev => ({ ...prev, [msgId]: false }))
+      setTypingId(null)
+      return
+    }
+
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          system: `You are MittiAI, an expert AI agricultural advisor for Indian farmers in a community chat.
+      const systemMsg = `You are Bhoomi Care, an expert AI agricultural advisor for Indian farmers in a community chat.
 A farmer posted a message. Reply helpfully and practically in the SAME language as the message.
 Hindi → Hindi, Tamil → Tamil, Telugu → Telugu, Bengali → Bengali, Marathi → Marathi,
 Punjabi → Punjabi, Gujarati → Gujarati, Kannada → Kannada, Odia → Odia, English → English.
-Keep reply under 100 words. Use • for lists. Use **bold** for key points. Sign off as "— MittiAI 🌱"`,
-          messages: [{ role: 'user', content: msgText }],
+Keep reply under 80 words. Use • for lists. Use **bold** for key points. Sign off as "— Bhoomi Care 🌱"`
+
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemMsg }] },
+          contents: [{ role: 'user', parts: [{ text: msgText }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 250 },
         }),
       })
-      const data  = await res.json()
-      const reply = data.content?.map(b => b.text ?? '').join('') || 'Unable to respond right now. Please try again.'
+
+      if (!res.ok) throw new Error('API Error')
+      const data = await res.json()
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to respond right now. Please try again.'
       setAiReplies(prev => ({ ...prev, [msgId]: reply }))
     } catch {
       setAiReplies(prev => ({ ...prev, [msgId]: 'Connection issue — please try again.' }))

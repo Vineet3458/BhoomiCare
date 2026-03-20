@@ -26,7 +26,7 @@ function MsgBubble({ msg, isOwn, aiReply, aiLoading, onAskAI, t }) {
             <div className="w-6 h-6 bg-earth-500 rounded-full flex items-center justify-center">
               <Bot size={12} className="text-white" />
             </div>
-            <span className="text-xs font-bold text-earth-700">MittiAI</span>
+            <span className="text-xs font-bold text-earth-700">Bhoomi Care</span>
           </div>
           <p className="text-xs text-earth-600 leading-relaxed">{msg.text}</p>
         </div>
@@ -87,7 +87,7 @@ function MsgBubble({ msg, isOwn, aiReply, aiLoading, onAskAI, t }) {
               <div className="mt-2 bg-earth-50 border border-earth-100 rounded-xl p-2.5 max-w-xs animate-fade-in">
                 <div className="flex items-center gap-1 mb-1.5">
                   <div className="w-4 h-4 bg-earth-500 rounded-full flex items-center justify-center"><Bot size={9} className="text-white" /></div>
-                  <span className="text-[10px] font-bold text-earth-700">MittiAI</span>
+                  <span className="text-[10px] font-bold text-earth-700">Bhoomi Care</span>
                 </div>
                 <div className="text-[11px] text-earth-700 leading-relaxed">{formatAI(aiReply)}</div>
               </div>
@@ -271,7 +271,7 @@ export default function CommunityPage() {
       </Card>
 
       <p className="text-[11px] text-earth-300 text-center mt-4">
-        MittiAI Community · 10 Indian languages supported · Messages are local to your session
+        Bhoomi Care Community · 10 Indian languages supported · Messages are local to your session
       </p>
     </div>
   )

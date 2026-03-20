@@ -1,11 +1,11 @@
-// Static soil sample data.
+// Static soil sample data — Updated for 2025-26
 // In production, replace with an API call (see hooks/useSoilData.js).
 
 export const SOIL_SAMPLE = {
   id: 'sample-001',
   field: 'Survey No. 47/2, Nashik District',
-  season: 'Rabi 2024–25',
-  testDate: '14 Nov 2024',
+  season: 'Rabi 2025–26',
+  testDate: '10 Nov 2025',
   score: 72,
   pH: 6.8,
   ec: 0.42,

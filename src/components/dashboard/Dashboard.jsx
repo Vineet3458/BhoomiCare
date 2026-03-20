@@ -1,12 +1,14 @@
-import { Upload, MapPin } from 'lucide-react'
+import { useState }   from 'react'
+import { Upload, MapPin, CalendarDays } from 'lucide-react'
 import { useLang }      from '../../context/LangContext.jsx'
 import { useSoilData }  from '../../hooks/useSoilData.js'
-import ScoreRing   from './ScoreRing.jsx'
-import RadarChart  from './RadarChart.jsx'
-import ActionPlan  from './ActionPlan.jsx'
-import Card        from '../ui/Card.jsx'
-import Button      from '../ui/Button.jsx'
-import Badge       from '../ui/Badge.jsx'
+import ScoreRing        from './ScoreRing.jsx'
+import RadarChart       from './RadarChart.jsx'
+import ActionPlan       from './ActionPlan.jsx'
+import Card             from '../ui/Card.jsx'
+import Button           from '../ui/Button.jsx'
+import Badge            from '../ui/Badge.jsx'
+import { UploadModal, FarmerQueriesSection } from './DashboardExtras.jsx'
 
 function StatChip({ label, value }) {
   return (
@@ -45,8 +47,10 @@ function MacroMiniCard({ n, t }) {
 }
 
 export default function Dashboard({ setTab }) {
-  const { t }           = useLang()
+  const { t }             = useLang()
   const { data, loading } = useSoilData()
+  const [showUpload, setShowUpload] = useState(false)
+  const [uploadedData, setUploadedData] = useState(null)
 
   if (loading || !data) {
     return (
@@ -58,8 +62,33 @@ export default function Dashboard({ setTab }) {
 
   const db = t.dashboard
 
+  function handleUploadDone(parsedData) {
+    setUploadedData(parsedData)
+    setShowUpload(false)
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+
+      {/* Upload Modal */}
+      {showUpload && (
+        <UploadModal
+          onClose={() => setShowUpload(false)}
+          onUpload={handleUploadDone}
+        />
+      )}
+
+      {/* Upload success notice */}
+      {uploadedData && (
+        <div className="mb-4 bg-moss-50 border border-moss-200 text-moss-800 rounded-2xl px-5 py-3 flex items-center gap-3 animate-slide-up">
+          <span className="text-xl">✅</span>
+          <div>
+            <p className="font-bold text-sm">Soil report uploaded successfully!</p>
+            <p className="text-xs text-moss-600">Dashboard updated · Visit AI Chat for personalized recommendations</p>
+          </div>
+          <button onClick={() => setUploadedData(null)} className="ml-auto text-moss-400 hover:text-moss-600 text-lg">×</button>
+        </div>
+      )}
 
       {/* Hero */}
       <div className="hero-pattern bg-earth-800 rounded-3xl p-6 mb-8 relative overflow-hidden">
@@ -70,11 +99,17 @@ export default function Dashboard({ setTab }) {
               {db.scoreLabel}
             </h1>
             <p className="text-earth-400 text-xs mt-1.5 flex items-center gap-1.5">
-              <MapPin size={11} />
-              {t.hero.location}
+              <MapPin size={11} /> {t.hero.location}
+            </p>
+            <p className="text-earth-500 text-[10px] mt-1 flex items-center gap-1.5">
+              <CalendarDays size={10} /> Rabi 2025–26 · Test date: 10 Nov 2025
             </p>
           </div>
-          <Button variant="primary" className="bg-earth-500 hover:bg-earth-400 self-start sm:self-auto">
+          <Button
+            variant="primary"
+            className="bg-earth-500 hover:bg-earth-400 self-start sm:self-auto"
+            onClick={() => setShowUpload(true)}
+          >
             <Upload size={14} /> {t.hero.upload}
           </Button>
         </div>
@@ -154,9 +189,12 @@ export default function Dashboard({ setTab }) {
               🤖 {t.nav.ai} →
             </button>
           </div>
-
         </div>
       </div>
+
+      {/* ── Farmer Queries FAQ Section (footer of dashboard) ── */}
+      <FarmerQueriesSection />
+
     </div>
   )
 }
