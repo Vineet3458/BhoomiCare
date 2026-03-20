@@ -1,34 +1,35 @@
-import { useState } from "react";
-import Navbar from "./components/Navbar";
-import Dashboard from "./components/Dashboard";
-import Nutrients from "./components/Nutrients";
-import Schemes from "./components/Schemes";
-import AIChat from "./components/AIChat";
+import React, { useState } from 'react'
+import { LangProvider } from './context/LangContext.jsx'
+import Navbar  from './components/layout/Navbar.jsx'
+import Footer  from './components/layout/Footer.jsx'
+import Dashboard   from './components/dashboard/Dashboard.jsx'
+import NutrientViz from './components/nutrients/NutrientViz.jsx'
+import GovtSchemes from './components/schemes/GovtSchemes.jsx'
+import AIAssistant from './components/assistant/AIAssistant.jsx'
 
-function App() {
-  const [activeTab, setActiveTab] = useState("home");
-
-  const renderPage = () => {
-    switch (activeTab) {
-      case "home":
-        return <Dashboard />;
-      case "nutrients":
-        return <Nutrients />;
-      case "schemes":
-        return <Schemes />;
-      case "ai":
-        return <AIChat />;
-      default:
-        return <Dashboard />;
-    }
-  };
+function Inner() {
+  const [tab, setTab] = useState('home')
 
   return (
-    <>
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-      {renderPage()}
-    </>
-  );
+    <div className="min-h-screen flex flex-col">
+      <Navbar activeTab={tab} setTab={setTab} />
+
+      <main className="flex-1 pb-16">
+        {tab === 'home'      && <Dashboard   setTab={setTab} />}
+        {tab === 'nutrients' && <NutrientViz />}
+        {tab === 'schemes'   && <GovtSchemes />}
+        {tab === 'ai'        && <AIAssistant />}
+      </main>
+
+      <Footer />
+    </div>
+  )
 }
 
-export default App;
+export default function App() {
+  return (
+    <LangProvider>
+      <Inner />
+    </LangProvider>
+  )
+}
