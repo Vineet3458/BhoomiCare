@@ -1,5 +1,5 @@
 import { useState }   from 'react'
-import { Upload, MapPin, CalendarDays } from 'lucide-react'
+import { Upload, MapPin, CalendarDays, CloudLightning, X } from 'lucide-react'
 import { useLang }      from '../../context/LangContext.jsx'
 import { useSoilData }  from '../../hooks/useSoilData.js'
 import ScoreRing        from './ScoreRing.jsx'
@@ -90,7 +90,6 @@ export default function Dashboard({ setTab }) {
         </div>
       )}
 
-      {/* Hero */}
       <div className="hero-pattern bg-earth-800 rounded-3xl p-6 mb-8 relative overflow-hidden">
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -113,6 +112,25 @@ export default function Dashboard({ setTab }) {
             <Upload size={14} /> {t.hero.upload}
           </Button>
         </div>
+      </div>
+
+      {/* Smart Weather Alert */}
+      <div className="bg-red-50 border-l-4 border-red-500 rounded-r-2xl p-4 mb-8 flex gap-3 items-start shadow-sm animate-fade-in">
+        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <CloudLightning size={16} className="text-red-600" />
+        </div>
+        <div>
+          <h3 className="text-red-800 font-bold text-sm">Smart Alert: Severe Weather Warning</h3>
+          <p className="text-red-600 text-xs mt-1 leading-relaxed">
+            High probability of <strong>unseasonal hailstorm and heavy rain</strong> in Nashik over the next 48 hours. 
+            <br className="hidden sm:block" />
+            <strong>Crop Action:</strong> Delay Urea top-dressing for Wheat. Ensure proper drainage in Chickpea fields to prevent root rot.
+          </p>
+        </div>
+        <button className="ml-auto text-red-400 hover:text-red-600">
+          <span className="sr-only">Dismiss</span>
+          <X size={16} />
+        </button>
       </div>
 
       {/* Main grid */}
