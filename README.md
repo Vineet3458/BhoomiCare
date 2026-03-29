@@ -35,7 +35,7 @@ bhoomicare/
 ```bash
 cd bhoomicare
 git add .
-git commit -m "chore: prepare for Vercel deployment"
+git commit -m "Initial Commit"
 git push
 ```
 
