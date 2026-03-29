@@ -192,7 +192,8 @@ export default function Marketplace({ onLoginRequired }) {
     if (cart.length === 0) return
 
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const apiBase = import.meta.env.VITE_API_URL || ''
+      const res = await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: cartTotal, currency: 'INR' })
