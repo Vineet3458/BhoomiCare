@@ -8,19 +8,21 @@ India's smart soil intelligence platform for farmers — AI soil analysis, gover
 
 ```
 bhoomicare/
-├── api/                  ← Vercel Serverless Functions (Node.js)
-│   ├── orders.js         ← POST /api/orders  (Razorpay order creation)
-│   ├── verify.js         ← POST /api/verify  (payment verification)
-│   └── package.json
+├── api/                  ← Vercel serverless entry
+│   └── index.js          ← Exports Express app for Vercel
 ├── client/               ← React + Vite frontend
-│   ├── src/
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── .env.example      ← copy → .env.local and fill in keys
-│   └── package.json
-├── server/               ← Legacy Express server (local dev only)
-│   └── server.js
-├── vercel.json           ← Vercel deployment config
+│   ├── src/              ← UI components & pages
+│   ├── vite.config.js    ← Client config (API proxy)
+│   └── .env.example      ← Frontend environment template
+├── server/               ← Express backend (MVC structure)
+│   ├── config/           ← MongoDB connection info
+│   ├── controllers/      ← Request handler logic
+│   ├── middleware/       ← Auth & security tools
+│   ├── models/           ← Mongoose schemas (User, Product, Order)
+│   ├── routes/           ← Express routers
+│   └── server.js         ← Main Express entry point
+├── package.json          ← Root dependencies for Vercel deployment
+├── vercel.json           ← Vercel routing configuration
 └── .gitignore
 ```
 
@@ -78,12 +80,12 @@ npm run dev
 # → http://localhost:5173
 ```
 
-### Backend (optional — for Razorpay testing locally)
+### Backend
 
 ```bash
 cd server
 npm install
-# Create server/.env with RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET
+# Create server/.env with MONGODB_URI, JWT_SECRET, and Razorpay keys
 node server.js
 # → http://localhost:5000
 ```

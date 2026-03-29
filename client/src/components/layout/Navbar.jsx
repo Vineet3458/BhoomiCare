@@ -52,11 +52,6 @@ export default function Navbar({ activeTab, setTab }) {
         </nav>
 
         <div className="flex items-center gap-1.5">
-          {/* PDF Download Button */}
-          <button onClick={() => window.print()} title="Download as PDF"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-sky-50 border border-sky-200 rounded-xl text-[11px] font-bold text-sky-700 hover:border-sky-400 hover:bg-sky-100 transition-all">
-            <Printer size={16} /> PDF
-          </button>
 
           {/* Lang dropdown */}
           <div className="relative">
