@@ -52,6 +52,8 @@ In **Project → Settings → Environment Variables**, add:
 | Variable | Value |
 |---|---|
 | `VITE_GEMINI_API_KEY` | Your Gemini API key from [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+| `MONGODB_URI` | Your MongoDB Connection String |
+| `JWT_SECRET` | Secret key for JWT Authentication |
 | `RAZORPAY_KEY_ID` | Your Razorpay key ID (optional — mock used if absent) |
 | `RAZORPAY_KEY_SECRET` | Your Razorpay key secret (optional) |
 
