@@ -53,13 +53,13 @@ In **Project → Settings → Environment Variables**, add:
 
 | Variable | Value |
 |---|---|
-| `VITE_GEMINI_API_KEY` | Your Gemini API key from [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+| `GEMINI_API_KEY` | Your Gemini API key from [aistudio.google.com](https://aistudio.google.com/app/apikey) |
 | `MONGODB_URI` | Your MongoDB Connection String |
 | `JWT_SECRET` | Secret key for JWT Authentication |
 | `RAZORPAY_KEY_ID` | Your Razorpay key ID (optional — mock used if absent) |
 | `RAZORPAY_KEY_SECRET` | Your Razorpay key secret (optional) |
 
-> **Important:** `VITE_*` variables are exposed to the browser. Never put secrets as `VITE_` prefixed vars. Razorpay secrets are only used in `/api/` serverless functions and are safe.
+> **Important:** The `GEMINI_API_KEY` is securely stored and used exclusively on the backend avoiding frontend browser exposure. Razorpay secrets are also only used in `/api/` node environments.
 
 ---
 
@@ -73,8 +73,6 @@ In **Project → Settings → Environment Variables**, add:
 
 ```bash
 cd client
-cp .env.example .env.local
-# Edit .env.local and add your VITE_GEMINI_API_KEY
 npm install
 npm run dev
 # → http://localhost:5173
@@ -85,7 +83,7 @@ npm run dev
 ```bash
 cd server
 npm install
-# Create server/.env with MONGODB_URI, JWT_SECRET, and Razorpay keys
+# Create server/.env with MONGODB_URI, JWT_SECRET, GEMINI_API_KEY, and Razorpay keys
 node server.js
 # → http://localhost:5000
 ```
@@ -112,7 +110,7 @@ node server.js
 | Layer | Technology |
 |---|---|
 | Frontend | React 18, Vite 5, Tailwind CSS 3 |
-| AI | Google Gemini 2.0 Flash |
+| AI | Google Gemini (Intelligent limit-fallback: `2.0-flash` → `1.5-pro` → `1.5-flash-8b` → `2.5-flash`) |
 | Payments | Razorpay |
 | Weather | Open-Meteo API (free, no key needed) |
 | Hosting | Vercel (frontend + serverless API) |

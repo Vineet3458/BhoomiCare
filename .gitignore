@@ -9,8 +9,6 @@ client/dist/
 client/.vite/
 
 # ── Environment variables (NEVER commit secrets) ─────────────
-.env
-.env.local
 .env.*.local
 client/.env
 client/.env.local
@@ -20,8 +18,8 @@ client/.env.*.local
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
 *.log
 
 # ── Vercel ───────────────────────────────────────────────────
 .vercel/
+config.bat
