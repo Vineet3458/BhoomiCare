@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
@@ -13,15 +14,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Database connection (do not crash if no MONGODB_URI is provided in dev yet, just warn)
-if (process.env.MONGODB_URI) {
-  connectDB();
-} else {
-  console.warn('⚠️ No MONGODB_URI provided. Database operations will fail.');
-}
-
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
@@ -34,10 +29,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// We only listen if this module is run directly via node
-// For serverless (Vercel), we just export the app
-if (require.main === module) {
-  app.listen(PORT, () => console.log(`🚀 Backend server running on port ${PORT}`));
-}
+const startServer = async () => {
+  try {
+    if (process.env.MONGODB_URI) {
+      await connectDB();
+    } else {
+      console.warn('⚠️ No MONGODB_URI found in env.');
+    }
+
+    if (require.main === module) {
+      app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
+    }
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+  }
+};
+
+startServer();
 
 module.exports = app;
