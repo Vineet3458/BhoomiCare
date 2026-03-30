@@ -31,6 +31,13 @@ export function useChat() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
+        // Surface specific quota/key errors to the user
+        if (res.status === 429) {
+          throw new Error('QUOTA_EXCEEDED')
+        }
+        if (res.status === 400 && err?.error === 'INVALID_API_KEY') {
+          throw new Error('INVALID_API_KEY')
+        }
         throw new Error(err?.error || `HTTP ${res.status}`)
       }
 
@@ -41,11 +48,23 @@ export function useChat() {
       setMessages(prev => [...prev, { role: 'assistant', content: reply }])
     } catch (err) {
       console.error('Chat Error:', err)
+      
+      let errorMessage = '🌿 **AI Connection issue** — please check your internet and try again.\n\n*Meanwhile: Is there a specific soil or crop question I can help with?*';
+      
+      if (err.message === 'QUOTA_EXCEEDED') {
+        errorMessage = '🌿 **Gemini API Error: Quota Exceeded** — The AI has reached its request limit for exactly your model or API key. Please check your billing or use a different API key.';
+      } else if (err.message === 'INVALID_API_KEY') {
+        errorMessage = '🌿 **Gemini API Error: Invalid Key** — The provided API key is invalid or not configured properly.';
+      } else if (err.message !== 'Failed to fetch' && err.message !== 'Load failed') {
+         // other specific backend errors
+         // errorMessage = `🌿 **API Error:** ${err.message}` // Optional: enable to show other messages
+      }
+
       setMessages(prev => [
         ...prev, 
         { 
           role: 'assistant', 
-          content: '🌿 **AI Connection issue** — please check your internet and try again.\n\n*Meanwhile: Is there a specific soil or crop question I can help with?*',
+          content: errorMessage,
         }
       ])
     } finally {

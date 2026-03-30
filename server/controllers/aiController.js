@@ -9,10 +9,6 @@ const chatWithGemini = async (req, res) => {
       return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on the server.' });
     }
 
-    console.log('--- AI Request ---');
-    console.log('Message:', message);
-    console.log('History:', JSON.stringify(history, null, 2));
-
     const genAI = new GoogleGenerativeAI(apiKey);
     
     const systemInstruction = `You are Bhoomi Care AI, an expert agricultural advisor and soil scientist built specifically for Indian farmers — small, marginal, and progressive. You are powered by Google Gemini and embedded in the Bhoomi Care platform for the Rabi 2025-26 season.
@@ -47,18 +43,35 @@ IMPORTANT 2025-26 DATA:
 - MSW Wheat: ₹2,425/quintal | Paddy: ₹2,300/quintal
 - KCC interest: 4% | PM-KISAN: ₹2,000/instalment`;
 
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemInstruction,
-    });
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-8b', 'gemini-2.5-flash'];
+    let text = null;
+    let lastError = null;
 
-    const chat = model.startChat({
-      history: history || [],
-    });
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          systemInstruction: systemInstruction,
+        });
 
-    const result = await chat.sendMessage(message);
-    const response = await result.response;
-    const text = response.text();
+        const chat = model.startChat({
+          history: history || [],
+        });
+
+        const result = await chat.sendMessage(message);
+        const response = await result.response;
+        text = response.text();
+        break; // Stop trying if successful
+      } catch (err) {
+        lastError = err;
+        // Continue to the next model in the list
+      }
+    }
+
+    if (!text) {
+      // If all models hit limits or fail, throw the last error to be handled below
+      throw lastError;
+    }
 
     res.json({ reply: text });
   } catch (error) {
@@ -66,7 +79,32 @@ IMPORTANT 2025-26 DATA:
     if (error.errorDetails) {
       console.error('Error Details:', JSON.stringify(error.errorDetails, null, 2));
     }
-    res.status(500).json({ error: 'Failed to get response from AI.' });
+
+    // Return specific error messages based on status code
+    const status = error.status || error.statusCode || 500;
+
+    if (status === 429) {
+      return res.status(429).json({
+        error: 'QUOTA_EXCEEDED',
+        message: 'Gemini API quota has been exceeded. Please try again later or use a new API key.',
+      });
+    }
+
+    if (status === 400 || status === 403) {
+      return res.status(400).json({
+        error: 'INVALID_API_KEY',
+        message: 'Gemini API key is invalid or missing. Please check your server .env file.',
+      });
+    }
+
+    if (status === 404) {
+      return res.status(404).json({
+        error: 'MODEL_NOT_FOUND',
+        message: 'The requested Gemini model was not found. Please check the model name.',
+      });
+    }
+
+    res.status(500).json({ error: 'Failed to get response from AI.', message: error.message });
   }
 };
 
