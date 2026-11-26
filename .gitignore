@@ -22,4 +22,6 @@ Thumbs.db
 
 # ── Vercel ───────────────────────────────────────────────────
 .vercel/
-config.bat
+.env
+.env.local
+.vscode/
